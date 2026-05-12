@@ -1,0 +1,10 @@
+# Ignore Node & React dependencies
+node_modules/
+dist/
+
+# Ignore Python dependencies
+venv/
+__pycache__/
+
+# Ignore Environment variables
+.env
