@@ -4,6 +4,7 @@ from langchain_groq import ChatGroq
 import uvicorn
 import yfinance as yf
 import math
+import os
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
