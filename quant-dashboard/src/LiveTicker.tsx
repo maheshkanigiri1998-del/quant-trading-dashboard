@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, Tooltip, ResponsiveContainer, YAxis, CartesianGrid } from 'recharts';
 
 interface Fundamentals {
   symbol: string;
@@ -67,7 +67,7 @@ export default function LiveTicker() {
         setPrice(`$${currentPriceNum.toFixed(2)}`);
         setLatency(Date.now() - tradeData.E);
         
-        setPriceHistory((prev) => {
+        setPriceHistory((prev: number[]) => {
           const newHistory = [...prev, currentPriceNum];
           if (newHistory.length > 40) newHistory.shift();
           const sum = newHistory.reduce((a, b) => a + b, 0);
@@ -104,8 +104,7 @@ export default function LiveTicker() {
     setIsFetchingData(true);
     setDcfData(null);
     try {
-      // UPDATED TO LOCALHOST
-      const response = await fetch(`http://localhost:8000/api/fundamentals/${tickerInput.toUpperCase()}`);
+      const response = await fetch(`https://quant-trading-dashboard-d8sy.onrender.com/api/fundamentals/${tickerInput.toUpperCase()}`);
       const data = await response.json();
       setFundamentals(data);
     } catch (error) {
@@ -118,8 +117,7 @@ export default function LiveTicker() {
     setIsFetchingDCF(true);
     setDcfData(null);
     try {
-      // UPDATED TO LOCALHOST
-      const response = await fetch(`http://localhost:8000/api/dcf/${tickerInput.toUpperCase()}`);
+      const response = await fetch(`https://quant-trading-dashboard-d8sy.onrender.com/api/dcf/${tickerInput.toUpperCase()}`);
       const data = await response.json();
       setDcfData(data);
     } catch (error) {
@@ -133,7 +131,6 @@ export default function LiveTicker() {
     setFinancialSummary(null);
     setAuditStep(0);
     try {
-      // UPDATED TO LOCALHOST
       const response = await fetch(`https://quant-trading-dashboard-d8sy.onrender.com/api/ai-summary/${tickerInput}`);
       const data = await response.json();
       
@@ -153,13 +150,13 @@ export default function LiveTicker() {
     let interval: ReturnType<typeof setInterval>;
     if (isFetchingSummary) {
       interval = setInterval(() => {
-        setAuditStep((prev) => (prev < 3 ? prev + 1 : prev));
+        setAuditStep((prev: number) => (prev < 3 ? prev + 1 : prev));
       }, 4000);
     }
     return () => clearInterval(interval);
   }, [isFetchingSummary]);
 
-  const chartData = priceHistory.map((p, index) => ({ time: index, price: p }));
+  const chartData = priceHistory.map((p: number, index: number) => ({ time: index, price: p }));
 
   const pipelineMessages = [
     "Initializing secure connection...",
@@ -201,7 +198,7 @@ export default function LiveTicker() {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-              <YAxis domain={['auto', 'auto']} stroke="#555" fontSize={10} width={45} tickFormatter={(val) => `$${val}`} />
+              <YAxis domain={['auto', 'auto']} stroke="#555" fontSize={10} width={45} tickFormatter={(val: any) => `$${val}`} />
               <Tooltip contentStyle={{ backgroundColor: '#111', border: '1px solid #444', borderRadius: '4px' }} itemStyle={{ color: '#00ff00', fontWeight: 'bold' }} labelStyle={{ display: 'none' }} />
               <Line type="monotone" dataKey="price" stroke="#00ff00" strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
@@ -236,7 +233,7 @@ export default function LiveTicker() {
           <div>
             <div className="skeleton-box" style={{ height: '24px', width: '120px', margin: '0 auto 15px auto', borderRadius: '4px' }}></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {[...Array(12)].map((_, i) => (
+              {[...Array(12)].map((_: any, i: number) => (
                 <div key={i} className="skeleton-box" style={{ height: '60px', borderRadius: '4px' }}></div>
               ))}
             </div>
@@ -260,7 +257,7 @@ export default function LiveTicker() {
                 { label: 'P/B RATIO', value: fundamentals.pb },
                 { label: 'BOOK VAL', value: typeof fundamentals.book_value === 'number' ? `₹${fundamentals.book_value.toFixed(2)}` : fundamentals.book_value },
                 { label: 'INTRINSIC VAL', value: typeof fundamentals.intrinsic_value === 'number' ? `₹${fundamentals.intrinsic_value.toFixed(2)}` : fundamentals.intrinsic_value }
-              ].map((metric, i) => (
+              ].map((metric: any, i: number) => (
                 <div key={i} style={{ backgroundColor: '#252525', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px' }}>{metric.label}</div>
                   <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#fff' }}>{metric.value}</div>
