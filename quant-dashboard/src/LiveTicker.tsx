@@ -28,7 +28,6 @@ interface DCFData {
 export default function LiveTicker() {
   const [price, setPrice] = useState<string>('Loading...');
   const [priceHistory, setPriceHistory] = useState<number[]>([]);
-  const [sma, setSma] = useState<number | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<string>('Connecting...');
   const [latency, setLatency] = useState<number | null>(null);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -70,8 +69,6 @@ export default function LiveTicker() {
         setPriceHistory((prev: number[]) => {
           const newHistory = [...prev, currentPriceNum];
           if (newHistory.length > 40) newHistory.shift();
-          const sum = newHistory.reduce((a, b) => a + b, 0);
-          setSma(sum / newHistory.length);
           return newHistory;
         });
       };
