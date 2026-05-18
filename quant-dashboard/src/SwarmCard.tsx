@@ -11,7 +11,7 @@ export default function SwarmCard() {
     setError("");
     try {
       // Make sure this port matches your FastAPI terminal (8000)
-      const response = await fetch(`http://127.0.0.1:8000/api/swarm?ticker=${encodeURIComponent(ticker)}`);
+      const response = await fetch(`https://quant-trading-dashboard-d8sy.onrender.com/api/swarm?ticker=${encodeURIComponent(ticker)}`);
       if (!response.ok) {
         throw new Error("Failed to fetch data from backend");
       }

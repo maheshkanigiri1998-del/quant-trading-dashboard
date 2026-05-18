@@ -134,7 +134,7 @@ export default function LiveTicker() {
     setAuditStep(0);
     try {
       // UPDATED TO LOCALHOST
-      const response = await fetch(`http://localhost:8000/api/ai-summary/${tickerInput.toUpperCase()}`);
+      const response = await fetch(`https://quant-trading-dashboard-d8sy.onrender.com/api/ai-summary/${tickerInput}`);
       const data = await response.json();
       
       if (data.error) {
