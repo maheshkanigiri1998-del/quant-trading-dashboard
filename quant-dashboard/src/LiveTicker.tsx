@@ -101,7 +101,7 @@ export default function LiveTicker() {
     setIsFetchingData(true);
     setDcfData(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
       const response = await fetch(`${baseUrl}/api/fundamentals/${tickerInput.toUpperCase()}`);
       const data = await response.json();
       setFundamentals(data);
@@ -115,7 +115,7 @@ export default function LiveTicker() {
     setIsFetchingDCF(true);
     setDcfData(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
       const response = await fetch(`${baseUrl}/api/dcf/${tickerInput.toUpperCase()}`);
       const data = await response.json();
       setDcfData(data);
@@ -130,7 +130,7 @@ export default function LiveTicker() {
     setFinancialSummary(null);
     setAuditStep(0);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
       const response = await fetch(`${baseUrl}/api/ai-summary/${tickerInput}`);
       const data = await response.json();
       
