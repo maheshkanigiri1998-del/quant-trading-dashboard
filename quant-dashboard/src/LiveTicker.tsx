@@ -46,7 +46,7 @@ export default function LiveTicker() {
 
   const MAX_LOSS = -5.00;
 
-  // GLOBAL PRODUCTION BACKEND URL (USES HTTPS)
+  // GLOBAL SECURE PRODUCTION ENDPOINT
   const BASE_URL = import.meta.env.VITE_API_URL || 'https://finance-swarm-backend.onrender.com';
 
   useEffect(() => {
@@ -100,12 +100,15 @@ export default function LiveTicker() {
     }
   };
 
-  // FIXED: Hits the secure https url configuration mapping
+  // HELPER FUNCTION: Safely encode symbols like dots (.NS) for path params
+  const getSafeTicker = () => encodeURIComponent(tickerInput.toUpperCase().trim());
+
+  // 1. FIXED FUNDAMENTALS FETCH ROUTE
   const fetchFundamentals = async () => {
     setIsFetchingData(true);
     setFundamentals(null);
     try {
-      const response = await fetch(`${BASE_URL}/api/fundamentals/${tickerInput.toUpperCase().trim()}`);
+      const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
       const data = await response.json();
       setFundamentals(data);
     } catch (error) {
@@ -114,12 +117,12 @@ export default function LiveTicker() {
     setIsFetchingData(false);
   };
 
-  // FIXED: No longer hardcoded to http on line 118
+  // 2. FIXED DCF FETCH ROUTE
   const fetchDCF = async () => {
     setIsFetchingDCF(true);
     setDcfData(null);
     try {
-      const response = await fetch(`${BASE_URL}/api/dcf/${tickerInput.toUpperCase().trim()}`);
+      const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
       const data = await response.json();
       setDcfData(data);
     } catch (error) {
@@ -128,13 +131,13 @@ export default function LiveTicker() {
     setIsFetchingDCF(false);
   };
 
-  // FIXED: No longer hardcoded to http on line 133
+  // 3. FIXED AI AUDIT FETCH ROUTE
   const fetchFinancialSummary = async () => {
     setIsFetchingSummary(true);
     setFinancialSummary(null);
     setAuditStep(0);
     try {
-      const response = await fetch(`${BASE_URL}/api/ai-summary/${tickerInput.toUpperCase().trim()}`);
+      const response = await fetch(`${BASE_URL}/api/ai-summary/${getSafeTicker()}`);
       const data = await response.json();
       
       if (data.error) {
