@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_groq import ChatGroq
@@ -13,14 +15,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # In production we lock this down, but for local testing, allow everything
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
