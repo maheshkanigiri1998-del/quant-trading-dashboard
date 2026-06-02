@@ -46,6 +46,9 @@ export default function LiveTicker() {
 
   const MAX_LOSS = -5.00;
 
+  // STRICT PRODUCTION BACKEND HOST (Using HTTPS as seen live on your Render dashboard)
+  const BASE_URL = import.meta.env.VITE_API_URL || 'https://finance-swarm-backend.onrender.com';
+
   useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -99,10 +102,9 @@ export default function LiveTicker() {
 
   const fetchFundamentals = async () => {
     setIsFetchingData(true);
-    setDcfData(null);
+    setFundamentals(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
-      const response = await fetch(`${baseUrl}/api/fundamentals/${tickerInput.toUpperCase()}`);
+      const response = await fetch(`${BASE_URL}/api/fundamentals/${tickerInput.toUpperCase().trim()}`);
       const data = await response.json();
       setFundamentals(data);
     } catch (error) {
@@ -115,8 +117,7 @@ export default function LiveTicker() {
     setIsFetchingDCF(true);
     setDcfData(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
-      const response = await fetch(`${baseUrl}/api/dcf/${tickerInput.toUpperCase()}`);
+      const response = await fetch(`${BASE_URL}/api/dcf/${tickerInput.toUpperCase().trim()}`);
       const data = await response.json();
       setDcfData(data);
     } catch (error) {
@@ -130,14 +131,13 @@ export default function LiveTicker() {
     setFinancialSummary(null);
     setAuditStep(0);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://finance-swarm-backend.onrender.com';
-      const response = await fetch(`${baseUrl}/api/ai-summary/${tickerInput}`);
+      const response = await fetch(`${BASE_URL}/api/ai-summary/${tickerInput.toUpperCase().trim()}`);
       const data = await response.json();
       
       if (data.error) {
         setFinancialSummary(`⚠️ AI ENGINE ERROR: ${data.error}`);
       } else {
-        setFinancialSummary(data.summary);
+        setFinancialSummary(data.summary || data.audit || JSON.stringify(data));
       }
       
     } catch (error) {
@@ -165,7 +165,6 @@ export default function LiveTicker() {
     "[3/3] Generating quantitative summary..."
   ];
 
-  // This log explicitly registers 'priceHistory' as read to bypass the compiler error safely
   console.log("Current streaming history length:", priceHistory.length);
 
   return (
