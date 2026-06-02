@@ -46,7 +46,7 @@ export default function LiveTicker() {
 
   const MAX_LOSS = -5.00;
 
-  // STRICT PRODUCTION BACKEND HOST (Using HTTPS as seen live on your Render dashboard)
+  // GLOBAL PRODUCTION BACKEND URL (USES HTTPS)
   const BASE_URL = import.meta.env.VITE_API_URL || 'https://finance-swarm-backend.onrender.com';
 
   useEffect(() => {
@@ -100,6 +100,7 @@ export default function LiveTicker() {
     }
   };
 
+  // FIXED: Hits the secure https url configuration mapping
   const fetchFundamentals = async () => {
     setIsFetchingData(true);
     setFundamentals(null);
@@ -108,11 +109,12 @@ export default function LiveTicker() {
       const data = await response.json();
       setFundamentals(data);
     } catch (error) {
-      console.error("Failed", error);
+      console.error("Failed fetching fundamentals", error);
     }
     setIsFetchingData(false);
   };
 
+  // FIXED: No longer hardcoded to http on line 118
   const fetchDCF = async () => {
     setIsFetchingDCF(true);
     setDcfData(null);
@@ -126,6 +128,7 @@ export default function LiveTicker() {
     setIsFetchingDCF(false);
   };
 
+  // FIXED: No longer hardcoded to http on line 133
   const fetchFinancialSummary = async () => {
     setIsFetchingSummary(true);
     setFinancialSummary(null);
@@ -164,8 +167,6 @@ export default function LiveTicker() {
     "[2/3] Passing heavy context to cloud engine...",
     "[3/3] Generating quantitative summary..."
   ];
-
-  console.log("Current streaming history length:", priceHistory.length);
 
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '400px', backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '8px', margin: '0 auto' }}>
