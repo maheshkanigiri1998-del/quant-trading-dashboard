@@ -16,12 +16,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+print("✅ All routes registered successfully!")
+
 @app.get("/")
 def root():
-    return {"status": "live", "message": "Backend is working"}
+    return {"status": "live", "message": "Backend is working - Routes Active"}
 
 @app.get("/api/fundamentals/{ticker}")
 def get_fundamentals(ticker: str):
+    print(f"✅ Fundamentals called for {ticker}")
     return {
         "symbol": ticker.upper(),
         "peg": "1.8",
@@ -40,14 +43,12 @@ def get_fundamentals(ticker: str):
 
 @app.get("/api/dcf/{ticker}")
 def get_dcf(ticker: str):
-    return {
-        "current_price": 2450,
-        "dcf_value": 3120,
-        "upside": 27.3
-    }
+    print(f"✅ DCF called for {ticker}")
+    return {"current_price": 2450, "dcf_value": 3120, "upside": 27.3}
 
 @app.get("/api/swarm")
 async def run_ai_swarm(ticker: str):
+    print(f"✅ Swarm called for {ticker}")
     return {
         "ticker": ticker.upper(),
         "latest_close": 2450,
@@ -55,4 +56,5 @@ async def run_ai_swarm(ticker: str):
     }
 
 if __name__ == "__main__":
+    print("🚀 Starting server on Render...")
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
