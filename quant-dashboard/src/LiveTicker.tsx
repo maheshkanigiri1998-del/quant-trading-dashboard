@@ -103,54 +103,63 @@ const BASE_URL = 'https://finance-swarm-backend.onrender.com';
   // HELPER FUNCTION: Safely encode symbols like dots (.NS) for path params
   const getSafeTicker = () => encodeURIComponent(tickerInput.toUpperCase().trim());
 
-  // 1. FIXED FUNDAMENTALS FETCH ROUTE
-  const fetchFundamentals = async () => {
-    setIsFetchingData(true);
+  // Replace fetchFundamentals
+const fetchFundamentals = async () => {
+  setIsFetchingData(true);
+  setFundamentals(null);
+  try {
+    const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    setFundamentals(data);
+  } catch (error) {
+    console.error("Failed fetching fundamentals", error);
+    // Don't crash the app
     setFundamentals(null);
-    try {
-      const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
-      const data = await response.json();
-      setFundamentals(data);
-    } catch (error) {
-      console.error("Failed fetching fundamentals", error);
-    }
+    alert(`Failed to fetch ${tickerInput}. Backend may be starting up. Try again in 15 seconds.`);
+  } finally {
     setIsFetchingData(false);
-  };
+  }
+};
 
-  // 2. FIXED DCF FETCH ROUTE
-  const fetchDCF = async () => {
-    setIsFetchingDCF(true);
-    setDcfData(null);
-    try {
-      const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
-      const data = await response.json();
-      setDcfData(data);
-    } catch (error) {
-      console.error("DCF Failed", error);
-    }
+// Replace fetchDCF
+const fetchDCF = async () => {
+  setIsFetchingDCF(true);
+  setDcfData(null);
+  try {
+    const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    setDcfData(data);
+  } catch (error) {
+    console.error("DCF Failed", error);
+    alert("DCF service unavailable. Try again later.");
+  } finally {
     setIsFetchingDCF(false);
-  };
+  }
+};
 
-  // 3. FIXED AI AUDIT FETCH ROUTE
-  const fetchFinancialSummary = async () => {
-    setIsFetchingSummary(true);
-    setFinancialSummary(null);
-    setAuditStep(0);
-    try {
-      const response = await fetch(`${BASE_URL}/api/ai-summary/${getSafeTicker()}`);
-      const data = await response.json();
-      
-      if (data.error) {
-        setFinancialSummary(`⚠️ AI ENGINE ERROR: ${data.error}`);
-      } else {
-        setFinancialSummary(data.summary || data.audit || JSON.stringify(data));
-      }
-      
-    } catch (error) {
-      setFinancialSummary("⚠️ SERVER ERROR: Could not connect to Python backend.");
-    }
+// Replace fetchFinancialSummary
+const fetchFinancialSummary = async () => {
+  setIsFetchingSummary(true);
+  setFinancialSummary(null);
+  setAuditStep(0);
+  try {
+    const response = await fetch(`${BASE_URL}/api/ai-summary/${getSafeTicker()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    setFinancialSummary(data.summary || data.audit || JSON.stringify(data));
+  } catch (error) {
+    console.error("AI Summary Failed", error);
+    setFinancialSummary("⚠️ Could not connect to AI backend. Please try again in 20 seconds.");
+  } finally {
     setIsFetchingSummary(false);
-  };
+  }
+};
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
