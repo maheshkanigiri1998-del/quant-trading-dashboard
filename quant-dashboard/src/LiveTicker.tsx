@@ -145,21 +145,25 @@ const fetchDCF = async () => {
 
 // Replace fetchFinancialSummary
 const fetchFinancialSummary = async () => {
-  setIsFetchingSummary(true);
-  setFinancialSummary(null);
-  setAuditStep(0);
-  try {
-    const response = await fetch(`${BASE_URL}/api/ai-summary/${getSafeTicker()}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    setFinancialSummary(data.summary || data.audit || JSON.stringify(data));
-  } catch (error) {
-    console.error("AI Summary Failed", error);
-    setFinancialSummary("⚠️ Could not connect to AI backend. Please try again in 20 seconds.");
-  } finally {
+    setIsFetchingSummary(true);
+    setFinancialSummary(null);
+    setAuditStep(0);
+    try {
+      const response = await fetch(`${BASE_URL}/api/swarm?ticker=${tickerInput.toUpperCase().trim()}`);
+      const data = await response.json();
+      
+      if (data.error) {
+        setFinancialSummary(`⚠️ AI ENGINE ERROR: ${data.error}`);
+      } else {
+        // Fix: Use data.swarm_decision to match your live Python backend
+        setFinancialSummary(data.swarm_decision || data.summary || JSON.stringify(data));
+      }
+      
+    } catch (error) {
+      setFinancialSummary("⚠️ SERVER ERROR: Could not connect to Python backend.");
+    }
     setIsFetchingSummary(false);
-  }
-};
+  };
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
