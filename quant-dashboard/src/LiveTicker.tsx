@@ -1,5 +1,5 @@
-import './index.css';
 import React, { useState, useEffect } from 'react';
+import './index.css';
 
 interface Fundamentals {
   symbol: string;
@@ -131,6 +131,9 @@ export default function LiveTicker() {
     }
   };
 
+  // Helper to check if asset is crypto to change the symbol prefix display
+  const isCrypto = ticker.startsWith('BTC') || ticker.includes('USD');
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -147,21 +150,39 @@ export default function LiveTicker() {
             </h1>
           </div>
 
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              value={inputTicker}
-              onChange={(e) => setInputTicker(e.target.value)}
-              placeholder="e.g. RELIANCE.NS, AAPL"
-              className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm uppercase w-48 md:w-64"
-            />
-            <button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-lg transition-all text-sm shadow-lg shadow-indigo-600/20"
-            >
-              Fetch
-            </button>
-          </form>
+          <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
+            {/* Quick Crypto Selector buttons */}
+            <div className="flex gap-2">
+              <button 
+                onClick={() => { setTicker('BTC-USD'); setInputTicker('BTC-USD'); }}
+                className={`text-xs px-3 py-1.5 rounded border font-mono transition-all ${ticker === 'BTC-USD' ? 'bg-amber-500/20 border-amber-500 text-amber-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'}`}
+              >
+                🪙 BTC-USD
+              </button>
+              <button 
+                onClick={() => { setTicker('RELIANCE.NS'); setInputTicker('RELIANCE.NS'); }}
+                className={`text-xs px-3 py-1.5 rounded border font-mono transition-all ${ticker === 'RELIANCE.NS' ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'}`}
+              >
+                📊 RELIANCE
+              </button>
+            </div>
+
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <input
+                type="text"
+                value={inputTicker}
+                onChange={(e) => setInputTicker(e.target.value)}
+                placeholder="e.g. BTC-USD, RELIANCE.NS"
+                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm uppercase w-44"
+              />
+              <button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-lg transition-all text-sm shadow-lg shadow-indigo-600/20"
+              >
+                Fetch
+              </button>
+            </form>
+          </div>
         </header>
 
         {/* MAIN GRID */}
@@ -173,12 +194,12 @@ export default function LiveTicker() {
             {/* FUNDAMENTALS CONTAINER */}
             <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-6 shadow-xl">
               <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-800/60 pb-2">
-                <span className="text-indigo-400">📊</span> Fundamental Metrics Matrix: <span className="text-indigo-400 font-mono">{ticker}</span>
+                <span className={isCrypto ? "text-amber-400" : "text-indigo-400"}>{isCrypto ? "🪙" : "📊"}</span> Matrix Feed: <span className="text-indigo-400 font-mono">{ticker}</span>
               </h2>
 
               {loadingFunds ? (
                 <div className="py-12 flex justify-center items-center text-slate-400 text-sm font-mono animate-pulse">
-                  Loading live exchange fields...
+                  Loading live asset matrix fields...
                 </div>
               ) : fundamentals ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 font-mono text-xs">
@@ -201,7 +222,7 @@ export default function LiveTicker() {
                   <div className="bg-slate-950/40 p-3 rounded-lg border border-slate-800/40">
                     <span className="text-slate-500 block mb-1">Intrinsic Value</span>
                     <span className="text-emerald-400 text-sm font-bold">
-                      {typeof fundamentals.intrinsic_value === 'number' ? `₹${fundamentals.intrinsic_value}` : fundamentals.intrinsic_value}
+                      {typeof fundamentals.intrinsic_value === 'number' ? `${isCrypto ? '$' : '₹'}${fundamentals.intrinsic_value}` : fundamentals.intrinsic_value}
                     </span>
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-lg border border-slate-800/40">
@@ -239,7 +260,7 @@ export default function LiveTicker() {
                 </div>
               ) : (
                 <div className="py-8 text-center text-slate-500 text-sm font-mono border border-dashed border-slate-800 rounded-lg">
-                  No matching financial listings located for this tracking ticker symbol.
+                  No matching exchange statistics located for this asset code.
                 </div>
               )}
             </div>
@@ -247,22 +268,22 @@ export default function LiveTicker() {
             {/* DCF MODEL BOX */}
             <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-5 shadow-xl">
               <h3 className="text-md font-bold text-emerald-400 mb-3 flex items-center gap-2">
-                <span>📈</span> DCF MODEL (5-YR)
+                <span>📈</span> {isCrypto ? 'VALUATION ENGINE (5-YR)' : 'DCF MODEL (5-YR)'}
               </h3>
               {loadingDcf ? (
                 <div className="text-slate-400 text-xs font-mono animate-pulse">Calculating intrinsic margins...</div>
               ) : dcf && !dcf.error ? (
                 <div className="grid grid-cols-3 gap-4 font-mono text-center">
                   <div className="bg-slate-950/40 p-3 rounded-lg border border-emerald-900/30">
-                    <div className="text-slate-500 text-xs mb-1">Current Share Price</div>
-                    <div className="text-md font-bold text-slate-200">₹{dcf.current_price}</div>
+                    <div className="text-slate-500 text-xs mb-1">Current Value</div>
+                    <div className="text-md font-bold text-slate-200">{isCrypto ? '$' : '₹'}{dcf.current_price}</div>
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-lg border border-emerald-900/30">
-                    <div className="text-slate-500 text-xs mb-1">Fair DCF Valuation</div>
-                    <div className="text-md font-bold text-emerald-400">₹{dcf.dcf_value}</div>
+                    <div className="text-slate-500 text-xs mb-1">Fair Evaluation</div>
+                    <div className="text-md font-bold text-emerald-400">{isCrypto ? '$' : '₹'}{dcf.dcf_value}</div>
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-lg border border-emerald-900/30">
-                    <div className="text-slate-500 text-xs mb-1">Implied Upside Margin</div>
+                    <div className="text-slate-500 text-xs mb-1">Implied Variance</div>
                     <div className={`text-md font-bold ${dcf.upside >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {dcf.upside}%
                     </div>
@@ -270,7 +291,7 @@ export default function LiveTicker() {
                 </div>
               ) : (
                 <div className="text-slate-500 text-xs font-mono">
-                  {dcf?.error || "Awaiting execution parameters."}
+                  {dcf?.error || "Awaiting calculation pipeline parameters."}
                 </div>
               )}
             </div>
@@ -278,10 +299,10 @@ export default function LiveTicker() {
             {/* AI FINANCIAL AUDIT BOX */}
             <div className="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-5 shadow-xl">
               <h3 className="text-md font-bold text-indigo-400 mb-3 flex items-center gap-2">
-                <span>🤖</span> AI FINANCIAL AUDIT
+                <span>🤖</span> AI SYNDICATE AUDIT
               </h3>
               {loadingSummary ? (
-                <div className="text-slate-400 text-xs font-mono animate-pulse">Parsing reports and statements...</div>
+                <div className="text-slate-400 text-xs font-mono animate-pulse">Parsing reports and ledger data streams...</div>
               ) : aiSummary && !aiSummary.error ? (
                 <div className="text-slate-300 text-xs leading-relaxed font-mono whitespace-pre-line bg-slate-950/30 p-4 rounded-lg border border-indigo-950/40">
                   {aiSummary.summary}
@@ -357,7 +378,7 @@ export default function LiveTicker() {
                 ) : (
                   <div className="text-slate-600 italic py-8 text-center">
                     Awaiting deployment trigger. Click button above to execute calculations.
-                    </div>
+                  </div>
                 )}
               </div>
             </div>
