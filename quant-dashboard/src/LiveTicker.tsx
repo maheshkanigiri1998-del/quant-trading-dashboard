@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Play, RotateCcw, AlertTriangle, CheckCircle2, TrendingUp, Cpu, Activity } from 'lucide-react';
 
 interface Fundamentals {
   symbol: string;
@@ -58,9 +57,9 @@ export default function LiveTicker() {
     setLoadingFunds(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/fundamentals?ticker=${cleanTicker}`);
-      const data = res.ok ? await res.json() : null;
-      if (data && !data.error) {
-        setFundamentals(data);
+      if (res.ok) {
+        const data = await res.json();
+        setFundamentals(data && !data.error ? data : null);
       } else {
         setFundamentals(null);
       }
@@ -74,9 +73,9 @@ export default function LiveTicker() {
     setLoadingDcf(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/dcf?ticker=${cleanTicker}`);
-      const data = res.ok ? await res.json() : null;
-      if (data && !data.error) {
-        setDcf(data);
+      if (res.ok) {
+        const data = await res.json();
+        setDcf(data && !data.error ? data : { current_price: 0, dcf_value: 0, upside: 0, error: 'DCF Calculation Error' });
       } else {
         setDcf({ current_price: 0, dcf_value: 0, upside: 0, error: 'DCF Calculation Error' });
       }
@@ -90,9 +89,9 @@ export default function LiveTicker() {
     setLoadingSummary(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/ai-summary?ticker=${cleanTicker}`);
-      const data = res.ok ? await res.json() : null;
-      if (data && !data.error) {
-        setAiSummary(data);
+      if (res.ok) {
+        const data = await res.json();
+        setAiSummary(data && !data.error ? data : { summary: '', error: 'Summary Generation Error' });
       } else {
         setAiSummary({ summary: '', error: 'Summary Generation Error' });
       }
@@ -132,11 +131,11 @@ export default function LiveTicker() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans w-full block">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans w-full block text-left">
       <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-6 w-full">
         <div>
           <div className="flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider text-sm">
-            <Activity className="w-4 h-4 animate-pulse" /> Live Terminal Workspace
+            <span>●</span> Live Terminal Workspace
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">
             Quant Trading & AI Swarm Dashboard
@@ -160,13 +159,13 @@ export default function LiveTicker() {
         </form>
       </header>
 
-      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 w-full text-left">
+      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         <div className="lg:col-span-2 space-y-6 w-full block">
           
-          {/* Fundamentals Matrix Component */}
+          {/* Fundamentals Matrix Panel */}
           <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-6 shadow-xl w-full block">
             <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-800/60 pb-2">
-              <TrendingUp className="w-5 h-5 text-indigo-400" /> Fundamental Metrics Matrix: <span className="text-indigo-400 font-mono">{ticker}</span>
+              <span className="text-indigo-400">📊</span> Fundamental Metrics Matrix: <span className="text-indigo-400 font-mono">{ticker}</span>
             </h2>
 
             {loadingFunds ? (
@@ -237,10 +236,10 @@ export default function LiveTicker() {
             )}
           </div>
 
-          {/* DCF Block Component */}
+          {/* DCF Block */}
           <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-emerald-400 mb-3 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5" /> DCF MODEL (5-YR)
+              <span>📈</span> DCF MODEL (5-YR)
             </h3>
             {loadingDcf ? (
               <div className="text-slate-400 text-xs font-mono animate-pulse">Calculating intrinsic margins...</div>
@@ -268,10 +267,10 @@ export default function LiveTicker() {
             )}
           </div>
 
-          {/* AI Financial Audit Component */}
+          {/* AI Financial Audit Panel */}
           <div className="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-indigo-400 mb-3 flex items-center gap-2">
-              <Cpu className="w-5 h-5" /> AI FINANCIAL AUDIT
+              <span>🤖</span> AI FINANCIAL AUDIT
             </h3>
             {loadingSummary ? (
               <div className="text-slate-400 text-xs font-mono animate-pulse">Parsing reports and statements...</div>
@@ -293,7 +292,7 @@ export default function LiveTicker() {
             <div>
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-800 w-full">
                 <h2 className="text-lg font-bold text-slate-200 flex items-center gap-2">
-                  <Cpu className="w-5 h-5 text-purple-400" /> CrewAI Multi-Agent Swarm
+                  <span>⚙️</span> CrewAI Multi-Agent Swarm
                 </h2>
                 <span className="px-2 py-0.5 bg-purple-950/60 border border-purple-800/60 text-purple-400 rounded text-[10px] font-mono uppercase tracking-wider font-semibold">
                   Gemini-2.5 Core
@@ -313,15 +312,7 @@ export default function LiveTicker() {
                     : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/10'
                 }`}
               >
-                {loadingSwarm ? (
-                  <>
-                    <RotateCcw className="w-4 h-4 animate-spin" /> RUNNING MULTI-AGENT SWARM...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 fill-white" /> RUN AI SWARM DEEP AUDIT
-                  </>
-                )}
+                {loadingSwarm ? "RUNNING MULTI-AGENT SWARM..." : "RUN AI SWARM DEEP AUDIT"}
               </button>
 
               <div className="mt-6 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs min-h-[220px] flex flex-col justify-between w-full">
@@ -367,7 +358,7 @@ export default function LiveTicker() {
 
             <div className="mt-6 p-3 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-between text-[11px] font-mono text-slate-400 w-full">
               <span className="flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Layer-2 Risk Filter
+                ⚠️ Layer-2 Risk Filter
               </span>
               <span className="text-emerald-400 font-semibold uppercase tracking-wider">ACTIVE & ARMED</span>
             </div>
