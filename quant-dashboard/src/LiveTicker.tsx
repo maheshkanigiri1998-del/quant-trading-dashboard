@@ -61,7 +61,7 @@ export default function LiveTicker() {
     setLoadingFunds(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/fundamentals?ticker=${cleanTicker}`);
-      const data = await res.ok ? await res.json() : null;
+      const data = res.ok ? await res.json() : null;
       if (data && !data.error) {
         setFundamentals(data);
       } else {
@@ -78,8 +78,12 @@ export default function LiveTicker() {
     setLoadingDcf(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/dcf?ticker=${cleanTicker}`);
-      const data = await res.ok ? await res.json() : null;
-      setDcf(data);
+      const data = res.ok ? await res.json() : null;
+      if (data && !data.error) {
+        setDcf(data);
+      } else {
+        setDcf({ current_price: 0, dcf_value: 0, upside: 0, error: data?.error || 'Failed to calculate DCF' });
+      }
     } catch (e) {
       console.error(e);
       setDcf({ current_price: 0, dcf_value: 0, upside: 0, error: 'Failed to fetch DCF' });
@@ -91,8 +95,12 @@ export default function LiveTicker() {
     setLoadingSummary(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/ai-summary?ticker=${cleanTicker}`);
-      const data = await res.json();
-      setAiSummary(data);
+      const data = res.ok ? await res.json() : null;
+      if (data && !data.error) {
+        setAiSummary(data);
+      } else {
+        setAiSummary({ summary: '', error: data?.error || 'Failed to generate summary' });
+      }
     } catch (e) {
       console.error(e);
       setAiSummary({ summary: '', error: 'Failed to load AI Audit summary' });
@@ -129,9 +137,9 @@ export default function LiveTicker() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans w-full block">
       {/* Header section */}
-      <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-6">
+      <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-6 w-full">
         <div>
           <div className="flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider text-sm">
             <Activity className="w-4 h-4 animate-pulse" /> Live Terminal Workspace
@@ -159,12 +167,12 @@ export default function LiveTicker() {
       </header>
 
       {/* Main Grid Workspace Layout */}
-      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 w-full text-left">
         
         {/* Left Column: Data Metrics & Analytics */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 w-full block">
           {/* Fundamentals Panel */}
-          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-6 shadow-xl">
+          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-6 shadow-xl w-full block">
             <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-800/60 pb-2">
               <TrendingUp className="w-5 h-5 text-indigo-400" /> Fundamental Metrics Matrix: <span className="text-indigo-400 font-mono">{ticker}</span>
             </h2>
@@ -238,7 +246,7 @@ export default function LiveTicker() {
           </div>
 
           {/* DCF Block */}
-          <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-5 shadow-xl">
+          <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-emerald-400 mb-3 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5" /> DCF MODEL (5-YR)
             </h3>
@@ -269,7 +277,7 @@ export default function LiveTicker() {
           </div>
 
           {/* AI Financial Audit Panel */}
-          <div className="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-5 shadow-xl">
+          <div className="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-indigo-400 mb-3 flex items-center gap-2">
               <Cpu className="w-5 h-5" /> AI FINANCIAL AUDIT
             </h3>
@@ -288,10 +296,10 @@ export default function LiveTicker() {
         </div>
 
         {/* Right Column: AI Multi-Agent Swarm Orchestrator */}
-        <div className="space-y-6">
-          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-6 shadow-2xl flex flex-col h-full justify-between">
+        <div className="space-y-6 w-full block">
+          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-6 shadow-2xl flex flex-col justify-between h-full w-full">
             <div>
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-800 w-full">
                 <h2 className="text-lg font-bold text-slate-200 flex items-center gap-2">
                   <Cpu className="w-5 h-5 text-purple-400" /> CrewAI Multi-Agent Swarm
                 </h2>
@@ -326,9 +334,9 @@ export default function LiveTicker() {
               </button>
 
               {/* Swarm Result Terminal Output */}
-              <div className="mt-6 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs min-h-[220px] flex flex-col justify-between">
+              <div className="mt-6 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs min-h-[220px] flex flex-col justify-between w-full">
                 <div>
-                  <div className="text-slate-500 border-b border-slate-900 pb-1.5 mb-2 flex justify-between items-center">
+                  <div className="text-slate-500 border-b border-slate-900 pb-1.5 mb-2 flex justify-between items-center w-full">
                     <span>Terminal Output:</span>
                     {loadingSwarm && <span className="text-purple-400 animate-pulse">● processing tokens</span>}
                   </div>
@@ -341,7 +349,7 @@ export default function LiveTicker() {
                     </div>
                   ) : swarm ? (
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-900/40 p-2 rounded border border-slate-800/40">
+                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-900/40 p-2 rounded border border-slate-800/40 w-full">
                         <div>
                           <span className="text-slate-500">XGBoost Pick:</span>
                           <span className="text-slate-300 font-bold block">{swarm.xgboost_prediction}</span>
@@ -359,7 +367,7 @@ export default function LiveTicker() {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-slate-600 italic py-8 text-center">
+                    <div className="text-slate-600 italic py-8 text-center w-full">
                       Awaiting deployment trigger. Click button above to execute calculations.
                     </div>
                   )}
@@ -368,7 +376,7 @@ export default function LiveTicker() {
             </div>
 
             {/* Guardrails Status Flag */}
-            <div className="mt-6 p-3 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <div className="mt-6 p-3 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-between text-[11px] font-mono text-slate-400 w-full">
               <span className="flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Layer-2 Risk Filter
               </span>
