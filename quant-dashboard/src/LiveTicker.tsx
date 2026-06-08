@@ -100,47 +100,48 @@ export default function LiveTicker() {
     }
   };
 
-  const getSafeTicker = () => encodeURIComponent(tickerInput.toUpperCase().trim());
+  const cleanTicker = () => encodeURIComponent(tickerInput.toUpperCase().trim());
 
+  // FETCH METRICS VIA QUERY PARAMS
   const fetchFundamentals = async () => {
     setIsFetchingData(true);
     setFundamentals(null);
     try {
-      const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
+      const response = await fetch(`${BASE_URL}/api/fundamentals?ticker=${cleanTicker()}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       setFundamentals(data);
     } catch (error) {
       console.error("Failed fetching fundamentals", error);
-      setFundamentals(null);
-      alert(`Failed to fetch ${tickerInput.toUpperCase()}. Try again in a few seconds.`);
+      alert(`Failed to request backend. Try again in a moment.`);
     } finally {
       setIsFetchingData(false);
     }
   };
 
+  // FETCH DCF VIA QUERY PARAMS
   const fetchDCF = async () => {
     setIsFetchingDCF(true);
     setDcfData(null);
     try {
-      const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
+      const response = await fetch(`${BASE_URL}/api/dcf?ticker=${cleanTicker()}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       setDcfData(data);
     } catch (error) {
       console.error("DCF Failed", error);
-      alert("DCF service unavailable.");
     } finally {
       setIsFetchingDCF(false);
     }
   };
 
+  // FETCH SWARM AUDIT VIA QUERY PARAMS
   const fetchFinancialSummary = async () => {
     setIsFetchingSummary(true);
     setFinancialSummary(null);
     setAuditStep(0);
     try {
-      const response = await fetch(`${BASE_URL}/api/swarm?ticker=${tickerInput.toUpperCase().trim()}`);
+      const response = await fetch(`${BASE_URL}/api/swarm?ticker=${cleanTicker()}`);
       const data = await response.json();
       if (data.error) {
         setFinancialSummary(`⚠️ AI ENGINE ERROR: ${data.error}`);
@@ -148,7 +149,7 @@ export default function LiveTicker() {
         setFinancialSummary(data.swarm_decision || data.summary || JSON.stringify(data));
       }
     } catch (error) {
-      setFinancialSummary("⚠️ SERVER ERROR: Could not connect to Python backend.");
+      setFinancialSummary("⚠️ SERVER ERROR: Check Backend logs.");
     }
     setIsFetchingSummary(false);
   };
