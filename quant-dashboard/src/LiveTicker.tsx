@@ -108,7 +108,7 @@ const fetchFundamentals = async () => {
   setIsFetchingData(true);
   setFundamentals(null);
   try {
-    const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
+    const response = await fetch(`${BASE_URL}/api/swarm?ticker=${tickerInput.toUpperCase().trim()}`);
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
