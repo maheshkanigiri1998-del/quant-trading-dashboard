@@ -47,7 +47,7 @@ export default function LiveTicker() {
   const MAX_LOSS = -5.00;
 
   // GLOBAL SECURE PRODUCTION ENDPOINT
-const BASE_URL = 'https://finance-swarm-backend-final3.onrender.com';
+  const BASE_URL = 'https://finance-swarm-backend-final3.onrender.com';
 
   useEffect(() => {
     let ws: WebSocket | null = null;
@@ -100,65 +100,53 @@ const BASE_URL = 'https://finance-swarm-backend-final3.onrender.com';
     }
   };
 
-  // HELPER FUNCTION: Safely encode symbols like dots (.NS) for path params
   const getSafeTicker = () => encodeURIComponent(tickerInput.toUpperCase().trim());
 
-  // Replace fetchFundamentals
-const fetchFundamentals = async () => {
-  setIsFetchingData(true);
-  setFundamentals(null);
-  try {
-    const response = await fetch(`${BASE_URL}/api/swarm?ticker=${tickerInput.toUpperCase().trim()}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    
-    const data = await response.json();
-    setFundamentals(data);
-  } catch (error) {
-    console.error("Failed fetching fundamentals", error);
-    // Don't crash the app
+  const fetchFundamentals = async () => {
+    setIsFetchingData(true);
     setFundamentals(null);
-    alert(`Failed to fetch ${tickerInput}. Backend may be starting up. Try again in 15 seconds.`);
-  } finally {
-    setIsFetchingData(false);
-  }
-};
+    try {
+      const response = await fetch(`${BASE_URL}/api/fundamentals/${getSafeTicker()}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      setFundamentals(data);
+    } catch (error) {
+      console.error("Failed fetching fundamentals", error);
+      setFundamentals(null);
+      alert(`Failed to fetch ${tickerInput.toUpperCase()}. Try again in a few seconds.`);
+    } finally {
+      setIsFetchingData(false);
+    }
+  };
 
-// Replace fetchDCF
-const fetchDCF = async () => {
-  setIsFetchingDCF(true);
-  setDcfData(null);
-  try {
-    const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    setDcfData(data);
-  } catch (error) {
-    console.error("DCF Failed", error);
-    alert("DCF service unavailable. Try again later.");
-  } finally {
-    setIsFetchingDCF(false);
-  }
-};
+  const fetchDCF = async () => {
+    setIsFetchingDCF(true);
+    setDcfData(null);
+    try {
+      const response = await fetch(`${BASE_URL}/api/dcf/${getSafeTicker()}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      setDcfData(data);
+    } catch (error) {
+      console.error("DCF Failed", error);
+      alert("DCF service unavailable.");
+    } finally {
+      setIsFetchingDCF(false);
+    }
+  };
 
-// Replace fetchFinancialSummary
-const fetchFinancialSummary = async () => {
+  const fetchFinancialSummary = async () => {
     setIsFetchingSummary(true);
     setFinancialSummary(null);
     setAuditStep(0);
     try {
       const response = await fetch(`${BASE_URL}/api/swarm?ticker=${tickerInput.toUpperCase().trim()}`);
       const data = await response.json();
-      
       if (data.error) {
         setFinancialSummary(`⚠️ AI ENGINE ERROR: ${data.error}`);
       } else {
-        // Fix: Use data.swarm_decision to match your live Python backend
         setFinancialSummary(data.swarm_decision || data.summary || JSON.stringify(data));
       }
-      
     } catch (error) {
       setFinancialSummary("⚠️ SERVER ERROR: Could not connect to Python backend.");
     }
@@ -260,22 +248,22 @@ const fetchFinancialSummary = async () => {
         ) : fundamentals ? (
           <div>
             <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginBottom: '15px', color: '#ff9800' }}>
-              {fundamentals.symbol}
+              {fundamentals.symbol || tickerInput.toUpperCase()}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               {[
-                { label: 'PEG', value: fundamentals.peg },
-                { label: 'PEGY', value: fundamentals.pegy },
-                { label: 'QUARTER SALES', value: fundamentals.q_revenue },
-                { label: 'QoQ REV GROWTH', value: typeof fundamentals.q_rev_growth === 'number' ? `${fundamentals.q_rev_growth}%` : fundamentals.q_rev_growth },
-                { label: 'QoQ PROFIT GROWTH', value: typeof fundamentals.q_profit_growth === 'number' ? `${fundamentals.q_profit_growth}%` : fundamentals.q_profit_growth },
-                { label: 'ROE (%)', value: fundamentals.roe },
-                { label: 'DEBT/EQ', value: fundamentals.debt_to_equity },
-                { label: 'EPS', value: typeof fundamentals.eps === 'number' ? `₹${fundamentals.eps.toFixed(2)}` : fundamentals.eps },
-                { label: 'CURR RATIO', value: fundamentals.current_ratio },
-                { label: 'P/B RATIO', value: fundamentals.pb },
-                { label: 'BOOK VAL', value: typeof fundamentals.book_value === 'number' ? `₹${fundamentals.book_value.toFixed(2)}` : fundamentals.book_value },
-                { label: 'INTRINSIC VAL', value: typeof fundamentals.intrinsic_value === 'number' ? `₹${fundamentals.intrinsic_value.toFixed(2)}` : fundamentals.intrinsic_value }
+                { label: 'PEG', value: fundamentals.peg ?? 'N/A' },
+                { label: 'PEGY', value: fundamentals.pegy ?? 'N/A' },
+                { label: 'QUARTER SALES', value: fundamentals.q_revenue ?? 'N/A' },
+                { label: 'QoQ REV GROWTH', value: typeof fundamentals.q_rev_growth === 'number' ? `${fundamentals.q_rev_growth}%` : (fundamentals.q_rev_growth ?? 'N/A') },
+                { label: 'QoQ PROFIT GROWTH', value: typeof fundamentals.q_profit_growth === 'number' ? `${fundamentals.q_profit_growth}%` : (fundamentals.q_profit_growth ?? 'N/A') },
+                { label: 'ROE (%)', value: fundamentals.roe ?? 'N/A' },
+                { label: 'DEBT/EQ', value: fundamentals.debt_to_equity ?? 'N/A' },
+                { label: 'EPS', value: typeof fundamentals.eps === 'number' ? `₹${fundamentals.eps.toFixed(2)}` : (fundamentals.eps ?? 'N/A') },
+                { label: 'CURR RATIO', value: fundamentals.current_ratio ?? 'N/A' },
+                { label: 'P/B RATIO', value: fundamentals.pb ?? 'N/A' },
+                { label: 'BOOK VAL', value: typeof fundamentals.book_value === 'number' ? `₹${fundamentals.book_value.toFixed(2)}` : (fundamentals.book_value ?? 'N/A') },
+                { label: 'INTRINSIC VAL', value: typeof fundamentals.intrinsic_value === 'number' ? `₹${fundamentals.intrinsic_value.toFixed(2)}` : (fundamentals.intrinsic_value ?? 'N/A') }
               ].map((metric: any, i: number) => (
                 <div key={i} style={{ backgroundColor: '#252525', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px' }}>{metric.label}</div>
