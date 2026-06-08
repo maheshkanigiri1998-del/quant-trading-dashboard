@@ -42,13 +42,11 @@ export default function LiveTicker() {
   const [ticker, setTicker] = useState('RELIANCE.NS');
   const [inputTicker, setInputTicker] = useState('RELIANCE.NS');
   
-  // State for different sections
   const [fundamentals, setFundamentals] = useState<Fundamentals | null>(null);
   const [dcf, setDcf] = useState<DCFData | null>(null);
   const [aiSummary, setAiSummary] = useState<AISummary | null>(null);
   const [swarm, setSwarm] = useState<SwarmResult | null>(null);
 
-  // Loading States
   const [loadingFunds, setLoadingFunds] = useState(false);
   const [loadingDcf, setLoadingDcf] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
@@ -57,7 +55,6 @@ export default function LiveTicker() {
   const fetchBaseData = async (targetTicker: string) => {
     const cleanTicker = targetTicker.trim().toUpperCase();
     
-    // 1. Fetch Fundamentals
     setLoadingFunds(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/fundamentals?ticker=${cleanTicker}`);
@@ -74,7 +71,6 @@ export default function LiveTicker() {
       setLoadingFunds(false);
     }
 
-    // 2. Fetch DCF Valuation
     setLoadingDcf(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/dcf?ticker=${cleanTicker}`);
@@ -82,7 +78,7 @@ export default function LiveTicker() {
       if (data && !data.error) {
         setDcf(data);
       } else {
-        setDcf({ current_price: 0, dcf_value: 0, upside: 0, error: data?.error || 'Failed to calculate DCF' });
+        setDcf({ current_price: 0, dcf_value: 0, upside: 0, error: 'DCF Calculation Error' });
       }
     } catch (e) {
       console.error(e);
@@ -91,7 +87,6 @@ export default function LiveTicker() {
       setLoadingDcf(false);
     }
 
-    // 3. Fetch AI Financial Audit Summary
     setLoadingSummary(true);
     try {
       const res = await fetch(`https://finance-swarm-backend-final3.onrender.com/api/ai-summary?ticker=${cleanTicker}`);
@@ -99,7 +94,7 @@ export default function LiveTicker() {
       if (data && !data.error) {
         setAiSummary(data);
       } else {
-        setAiSummary({ summary: '', error: data?.error || 'Failed to generate summary' });
+        setAiSummary({ summary: '', error: 'Summary Generation Error' });
       }
     } catch (e) {
       console.error(e);
@@ -138,7 +133,6 @@ export default function LiveTicker() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans w-full block">
-      {/* Header section */}
       <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-6 w-full">
         <div>
           <div className="flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider text-sm">
@@ -166,12 +160,10 @@ export default function LiveTicker() {
         </form>
       </header>
 
-      {/* Main Grid Workspace Layout */}
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 w-full text-left">
-        
-        {/* Left Column: Data Metrics & Analytics */}
         <div className="lg:col-span-2 space-y-6 w-full block">
-          {/* Fundamentals Panel */}
+          
+          {/* Fundamentals Matrix Component */}
           <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-6 shadow-xl w-full block">
             <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-800/60 pb-2">
               <TrendingUp className="w-5 h-5 text-indigo-400" /> Fundamental Metrics Matrix: <span className="text-indigo-400 font-mono">{ticker}</span>
@@ -245,7 +237,7 @@ export default function LiveTicker() {
             )}
           </div>
 
-          {/* DCF Block */}
+          {/* DCF Block Component */}
           <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-emerald-400 mb-3 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5" /> DCF MODEL (5-YR)
@@ -276,7 +268,7 @@ export default function LiveTicker() {
             )}
           </div>
 
-          {/* AI Financial Audit Panel */}
+          {/* AI Financial Audit Component */}
           <div className="bg-indigo-950/20 border border-indigo-900/40 rounded-xl p-5 shadow-xl w-full block">
             <h3 className="text-md font-bold text-indigo-400 mb-3 flex items-center gap-2">
               <Cpu className="w-5 h-5" /> AI FINANCIAL AUDIT
@@ -295,7 +287,7 @@ export default function LiveTicker() {
           </div>
         </div>
 
-        {/* Right Column: AI Multi-Agent Swarm Orchestrator */}
+        {/* Right Column Component */}
         <div className="space-y-6 w-full block">
           <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-6 shadow-2xl flex flex-col justify-between h-full w-full">
             <div>
@@ -312,7 +304,6 @@ export default function LiveTicker() {
                 Deploys a specialized committee of independent AI agents (Quant Analyst, Sentiment Strategist, and Chief Risk Officer) to audit the XGBoost models and generate a final trading verdict.
               </p>
 
-              {/* Action Button */}
               <button
                 onClick={runSwarmAnalysis}
                 disabled={loadingSwarm}
@@ -333,7 +324,6 @@ export default function LiveTicker() {
                 )}
               </button>
 
-              {/* Swarm Result Terminal Output */}
               <div className="mt-6 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs min-h-[220px] flex flex-col justify-between w-full">
                 <div>
                   <div className="text-slate-500 border-b border-slate-900 pb-1.5 mb-2 flex justify-between items-center w-full">
@@ -375,7 +365,6 @@ export default function LiveTicker() {
               </div>
             </div>
 
-            {/* Guardrails Status Flag */}
             <div className="mt-6 p-3 bg-slate-950/60 border border-slate-800/80 rounded-lg flex items-center justify-between text-[11px] font-mono text-slate-400 w-full">
               <span className="flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Layer-2 Risk Filter
@@ -384,7 +373,6 @@ export default function LiveTicker() {
             </div>
           </div>
         </div>
-
       </main>
     </div>
   );
