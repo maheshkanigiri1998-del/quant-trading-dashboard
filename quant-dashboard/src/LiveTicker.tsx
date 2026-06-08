@@ -47,7 +47,7 @@ export default function LiveTicker() {
   const MAX_LOSS = -5.00;
 
   // GLOBAL SECURE PRODUCTION ENDPOINT
-const BASE_URL = 'https://finance-swarm-backend.onrender.com';
+const BASE_URL = 'https://finance-swarm-backend-final3.onrender.com';
 
   useEffect(() => {
     let ws: WebSocket | null = null;
