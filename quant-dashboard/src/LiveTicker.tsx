@@ -70,10 +70,13 @@ export default function LiveTicker() {
 
   const MAX_LOSS = -5.00;
 
-  // Dynamically uses hostname (localhost or 127.0.0.1) to avoid browser CORS origin blocks
-  const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? `http://${window.location.hostname}:10000` 
-    : 'https://finance-swarm-backend-final3.onrender.com';
+  // Local: talk to FastAPI on :10000. Production: same-origin /api (Vercel rewrite → Render).
+  // Optional override: set VITE_API_BASE_URL at build time.
+  const API_BASE_URL =
+    (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ||
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? `http://${window.location.hostname}:10000`
+      : '');
 
   useEffect(() => {
     let ws: WebSocket | null = null;
@@ -250,7 +253,7 @@ export default function LiveTicker() {
   ];
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '400px', backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '8px', margin: '0 auto' }}>
+    <div style={{ padding: '16px', fontFamily: 'monospace', maxWidth: '400px', width: '100%', boxSizing: 'border-box', backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '8px', margin: '0 auto' }}>
       
       <style>
         {`

@@ -1,11 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 yfinance
-xgboost
-scikit-learn
-crewai
-google-genai
-python-dotenv
 pandas
 numpy
-langchain-groq

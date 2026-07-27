@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Financial Analytics Engine")
 
-# Enable CORS for local dev
+# Enable CORS for local dev and public frontend hosts
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,6 +14,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+def root():
+    """Health check for Render / load balancers."""
+    return {"status": "live", "message": "Financial Analytics Engine Operational"}
 
 
 def get_currency_symbol(info: dict, ticker: str) -> str:
