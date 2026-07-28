@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://quant-trading-dashboard-d8sy.onrender.com/api/:path*"
+      "destination": "https://quant-trading-dashboard-1.onrender.com/api/:path*"
     }
   ]
 }
